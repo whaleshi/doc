@@ -1,0 +1,2159 @@
+{
+    "address": "mmmBS4EdwiWqiJ8acVXfB5MprWtmTVMfcqCmGX4rzGd",
+    "metadata": {
+        "name": "mmm",
+        "version": "0.1.0",
+        "spec": "0.1.0",
+        "description": "MMM Contract"
+    },
+    "instructions": [
+        {
+            "name": "claim_hunt_gold",
+            "discriminator": [85, 137, 80, 144, 53, 123, 9, 218],
+            "accounts": [
+                {
+                    "name": "user",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "token_vault",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [116, 111, 107, 101, 110, 95, 118, 97, 117, 108, 116]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "token_vault.mint",
+                                "account": "TokenVault"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "user_stake",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [117, 115, 101, 114, 95, 115, 116, 97, 107, 101]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "user"
+                            },
+                            {
+                                "kind": "account",
+                                "path": "token_vault.mint",
+                                "account": "TokenVault"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "user_token_account",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "account",
+                                "path": "user"
+                            },
+                            {
+                                "kind": "const",
+                                "value": [
+                                    6, 221, 246, 225, 215, 101, 161, 147, 217, 203, 225, 70, 206, 235, 121, 172, 28, 180, 133,
+                                    237, 95, 91, 55, 145, 58, 140, 245, 133, 126, 255, 0, 169
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "token_vault.mint",
+                                "account": "TokenVault"
+                            }
+                        ],
+                        "program": {
+                            "kind": "const",
+                            "value": [
+                                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142, 13, 131, 11, 90, 19, 153, 218, 255,
+                                16, 132, 4, 142, 123, 216, 219, 233, 248, 89
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "vault_token_account",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [118, 97, 117, 108, 116, 95, 116, 111, 107, 101, 110, 95, 97, 99, 99, 111, 117, 110, 116]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "vault_token_account.mint",
+                                "account": "TokenAccount"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "config",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [112, 114, 111, 103, 114, 97, 109, 95, 99, 111, 110, 102, 105, 103]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "token_program",
+                    "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+                },
+                {
+                    "name": "event_authority",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "program"
+                }
+            ],
+            "args": []
+        },
+        {
+            "name": "claim_red_packet",
+            "discriminator": [1, 255, 242, 87, 21, 112, 206, 239],
+            "accounts": [
+                {
+                    "name": "recipient",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "config",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [112, 114, 111, 103, 114, 97, 109, 95, 99, 111, 110, 102, 105, 103]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "token_vault",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [116, 111, 107, 101, 110, 95, 118, 97, 117, 108, 116]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "vault_token_account.mint",
+                                "account": "TokenAccount"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "vault_token_account",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [118, 97, 117, 108, 116, 95, 116, 111, 107, 101, 110, 95, 97, 99, 99, 111, 117, 110, 116]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "vault_token_account.mint",
+                                "account": "TokenAccount"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "recipient_token_account",
+                    "writable": true
+                },
+                {
+                    "name": "order_claim",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [111, 114, 100, 101, 114, 95, 99, 108, 97, 105, 109]
+                            },
+                            {
+                                "kind": "arg",
+                                "path": "args.order_id"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "first_level_referrer_token_account",
+                    "docs": ["First level referrer's token account (optional)"],
+                    "writable": true,
+                    "optional": true
+                },
+                {
+                    "name": "second_level_referrer_token_account",
+                    "docs": ["Second level referrer's token account (optional)"],
+                    "writable": true,
+                    "optional": true
+                },
+                {
+                    "name": "system_program",
+                    "address": "11111111111111111111111111111111"
+                },
+                {
+                    "name": "token_program",
+                    "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+                },
+                {
+                    "name": "event_authority",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "program"
+                }
+            ],
+            "args": [
+                {
+                    "name": "args",
+                    "type": {
+                        "defined": {
+                            "name": "ClaimRedPacketArgs"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "claim_red_packet2",
+            "discriminator": [16, 41, 144, 170, 175, 250, 235, 77],
+            "accounts": [
+                {
+                    "name": "recipient",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "config",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [112, 114, 111, 103, 114, 97, 109, 95, 99, 111, 110, 102, 105, 103]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "token_vault",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [116, 111, 107, 101, 110, 95, 118, 97, 117, 108, 116]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "vault_token_account.mint",
+                                "account": "TokenAccount"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "vault_token_account",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [118, 97, 117, 108, 116, 95, 116, 111, 107, 101, 110, 95, 97, 99, 99, 111, 117, 110, 116]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "vault_token_account.mint",
+                                "account": "TokenAccount"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "recipient_token_account",
+                    "writable": true
+                },
+                {
+                    "name": "order_claim",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [111, 114, 100, 101, 114, 95, 99, 108, 97, 105, 109]
+                            },
+                            {
+                                "kind": "arg",
+                                "path": "args.order_id"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "first_level_referrer_token_account",
+                    "docs": ["First level referrer's token account (optional)"],
+                    "writable": true,
+                    "optional": true
+                },
+                {
+                    "name": "second_level_referrer_token_account",
+                    "docs": ["Second level referrer's token account (optional)"],
+                    "writable": true,
+                    "optional": true
+                },
+                {
+                    "name": "system_program",
+                    "address": "11111111111111111111111111111111"
+                },
+                {
+                    "name": "token_program",
+                    "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+                },
+                {
+                    "name": "event_authority",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "program"
+                }
+            ],
+            "args": [
+                {
+                    "name": "args",
+                    "type": {
+                        "defined": {
+                            "name": "ClaimRedPacket2Args"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "create_meteora_pool",
+            "discriminator": [246, 254, 33, 37, 225, 176, 41, 232],
+            "accounts": [
+                {
+                    "name": "admin",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "config",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [112, 114, 111, 103, 114, 97, 109, 95, 99, 111, 110, 102, 105, 103]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "token_mint",
+                    "docs": ["The token mint to create pool for (regular SPL token)"]
+                },
+                {
+                    "name": "admin_token_account",
+                    "docs": ["Admin's token account"],
+                    "writable": true
+                },
+                {
+                    "name": "admin_wsol_account",
+                    "docs": ["Admin's WSOL account"],
+                    "writable": true
+                },
+                {
+                    "name": "position_nft_mint",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "position_nft_account",
+                    "writable": true
+                },
+                {
+                    "name": "pool_authority"
+                },
+                {
+                    "name": "pool",
+                    "writable": true
+                },
+                {
+                    "name": "position",
+                    "writable": true
+                },
+                {
+                    "name": "wsol_mint",
+                    "docs": ["WSOL mint (native SOL)"]
+                },
+                {
+                    "name": "token_a_vault",
+                    "writable": true
+                },
+                {
+                    "name": "token_b_vault",
+                    "writable": true
+                },
+                {
+                    "name": "meteora_event_authority"
+                },
+                {
+                    "name": "meteora_damm_v2_program"
+                },
+                {
+                    "name": "system_program",
+                    "address": "11111111111111111111111111111111"
+                },
+                {
+                    "name": "token_program",
+                    "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+                },
+                {
+                    "name": "token_2022_program",
+                    "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+                },
+                {
+                    "name": "associated_token_program",
+                    "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+                },
+                {
+                    "name": "event_authority",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "program"
+                }
+            ],
+            "args": [
+                {
+                    "name": "params",
+                    "type": {
+                        "defined": {
+                            "name": "CreateMeteoraPoolParams"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "create_token",
+            "discriminator": [84, 52, 204, 228, 24, 140, 234, 75],
+            "accounts": [
+                {
+                    "name": "payer",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "config",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [112, 114, 111, 103, 114, 97, 109, 95, 99, 111, 110, 102, 105, 103]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "mint",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "token_vault",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [116, 111, 107, 101, 110, 95, 118, 97, 117, 108, 116]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "mint"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "vault_token_account",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [118, 97, 117, 108, 116, 95, 116, 111, 107, 101, 110, 95, 97, 99, 99, 111, 117, 110, 116]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "mint"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "metadata",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [109, 101, 116, 97, 100, 97, 116, 97]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "metadata_program"
+                            },
+                            {
+                                "kind": "account",
+                                "path": "mint"
+                            }
+                        ],
+                        "program": {
+                            "kind": "account",
+                            "path": "metadata_program"
+                        }
+                    }
+                },
+                {
+                    "name": "metadata_program",
+                    "address": "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
+                },
+                {
+                    "name": "token_program",
+                    "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+                },
+                {
+                    "name": "associated_token_program",
+                    "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+                },
+                {
+                    "name": "system_program",
+                    "address": "11111111111111111111111111111111"
+                },
+                {
+                    "name": "rent",
+                    "address": "SysvarRent111111111111111111111111111111111"
+                },
+                {
+                    "name": "event_authority",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "program"
+                }
+            ],
+            "args": [
+                {
+                    "name": "name",
+                    "type": "string"
+                },
+                {
+                    "name": "symbol",
+                    "type": "string"
+                },
+                {
+                    "name": "uri",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "deposit",
+            "discriminator": [242, 35, 198, 137, 82, 225, 242, 182],
+            "accounts": [
+                {
+                    "name": "user",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "mint"
+                },
+                {
+                    "name": "user_token_account",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "account",
+                                "path": "user"
+                            },
+                            {
+                                "kind": "const",
+                                "value": [
+                                    6, 221, 246, 225, 215, 101, 161, 147, 217, 203, 225, 70, 206, 235, 121, 172, 28, 180, 133,
+                                    237, 95, 91, 55, 145, 58, 140, 245, 133, 126, 255, 0, 169
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "mint"
+                            }
+                        ],
+                        "program": {
+                            "kind": "const",
+                            "value": [
+                                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142, 13, 131, 11, 90, 19, 153, 218, 255,
+                                16, 132, 4, 142, 123, 216, 219, 233, 248, 89
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "program_config",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [112, 114, 111, 103, 114, 97, 109, 95, 99, 111, 110, 102, 105, 103]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "fee_recipient",
+                    "writable": true
+                },
+                {
+                    "name": "fee_recipient_token_account",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "account",
+                                "path": "fee_recipient"
+                            },
+                            {
+                                "kind": "const",
+                                "value": [
+                                    6, 221, 246, 225, 215, 101, 161, 147, 217, 203, 225, 70, 206, 235, 121, 172, 28, 180, 133,
+                                    237, 95, 91, 55, 145, 58, 140, 245, 133, 126, 255, 0, 169
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "mint"
+                            }
+                        ],
+                        "program": {
+                            "kind": "const",
+                            "value": [
+                                140, 151, 37, 143, 78, 36, 137, 241, 187, 61, 16, 41, 20, 142, 13, 131, 11, 90, 19, 153, 218, 255,
+                                16, 132, 4, 142, 123, 216, 219, 233, 248, 89
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "system_program",
+                    "address": "11111111111111111111111111111111"
+                },
+                {
+                    "name": "token_program",
+                    "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+                },
+                {
+                    "name": "associated_token_program",
+                    "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+                },
+                {
+                    "name": "event_authority",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "program"
+                }
+            ],
+            "args": [
+                {
+                    "name": "args",
+                    "type": {
+                        "defined": {
+                            "name": "DepositArgs"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "initialize_config",
+            "discriminator": [208, 127, 21, 1, 194, 190, 196, 70],
+            "accounts": [
+                {
+                    "name": "admin",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "program_config",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [112, 114, 111, 103, 114, 97, 109, 95, 99, 111, 110, 102, 105, 103]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "system_program",
+                    "address": "11111111111111111111111111111111"
+                }
+            ],
+            "args": [
+                {
+                    "name": "args",
+                    "type": {
+                        "defined": {
+                            "name": "InitializeConfigArgs"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "permanent_lock_position",
+            "discriminator": [165, 176, 125, 6, 231, 171, 186, 213],
+            "accounts": [
+                {
+                    "name": "config",
+                    "docs": ["The program config account"]
+                },
+                {
+                    "name": "position_owner",
+                    "docs": ["The position owner who is locking their liquidity (must be platform)"],
+                    "signer": true
+                },
+                {
+                    "name": "meteora_pool",
+                    "docs": ["Meteora DAMM V2 pool account"],
+                    "writable": true
+                },
+                {
+                    "name": "meteora_position",
+                    "docs": ["Meteora position account to be locked"],
+                    "writable": true
+                },
+                {
+                    "name": "position_nft_account",
+                    "docs": ["Position NFT token account"]
+                },
+                {
+                    "name": "meteora_program",
+                    "docs": ["Meteora DAMM V2 program"]
+                },
+                {
+                    "name": "meteora_event_authority",
+                    "docs": ["Meteora event authority PDA"]
+                },
+                {
+                    "name": "event_authority",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "program"
+                }
+            ],
+            "args": [
+                {
+                    "name": "args",
+                    "type": {
+                        "defined": {
+                            "name": "PermanentLockPositionArgs"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "refund_hunt_gold",
+            "discriminator": [59, 55, 113, 133, 109, 77, 151, 152],
+            "accounts": [
+                {
+                    "name": "user",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "token_vault",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [116, 111, 107, 101, 110, 95, 118, 97, 117, 108, 116]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "token_vault.mint",
+                                "account": "TokenVault"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "user_stake",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [117, 115, 101, 114, 95, 115, 116, 97, 107, 101]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "user"
+                            },
+                            {
+                                "kind": "account",
+                                "path": "token_vault.mint",
+                                "account": "TokenVault"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "config",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [112, 114, 111, 103, 114, 97, 109, 95, 99, 111, 110, 102, 105, 103]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "system_program",
+                    "address": "11111111111111111111111111111111"
+                },
+                {
+                    "name": "event_authority",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "program"
+                }
+            ],
+            "args": []
+        },
+        {
+            "name": "stake_hunt_gold",
+            "discriminator": [39, 68, 57, 215, 9, 68, 112, 186],
+            "accounts": [
+                {
+                    "name": "user",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "token_vault",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [116, 111, 107, 101, 110, 95, 118, 97, 117, 108, 116]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "token_vault.mint",
+                                "account": "TokenVault"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "user_stake",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [117, 115, 101, 114, 95, 115, 116, 97, 107, 101]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "user"
+                            },
+                            {
+                                "kind": "account",
+                                "path": "token_vault.mint",
+                                "account": "TokenVault"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "config",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [112, 114, 111, 103, 114, 97, 109, 95, 99, 111, 110, 102, 105, 103]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "system_program",
+                    "address": "11111111111111111111111111111111"
+                },
+                {
+                    "name": "event_authority",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "program"
+                }
+            ],
+            "args": [
+                {
+                    "name": "args",
+                    "type": {
+                        "defined": {
+                            "name": "StakeHuntGoldArgs"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "update_config",
+            "discriminator": [29, 158, 252, 191, 10, 83, 219, 99],
+            "accounts": [
+                {
+                    "name": "admin",
+                    "writable": true,
+                    "signer": true,
+                    "relations": ["program_config"]
+                },
+                {
+                    "name": "program_config",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [112, 114, 111, 103, 114, 97, 109, 95, 99, 111, 110, 102, 105, 103]
+                            }
+                        ]
+                    }
+                }
+            ],
+            "args": [
+                {
+                    "name": "args",
+                    "type": {
+                        "defined": {
+                            "name": "UpdateConfigArgs"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "withdraw_from_vault",
+            "discriminator": [180, 34, 37, 46, 156, 0, 211, 238],
+            "accounts": [
+                {
+                    "name": "admin",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "config",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [112, 114, 111, 103, 114, 97, 109, 95, 99, 111, 110, 102, 105, 103]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "token_vault",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [116, 111, 107, 101, 110, 95, 118, 97, 117, 108, 116]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "vault_token_account.mint",
+                                "account": "TokenAccount"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "vault_token_account",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [118, 97, 117, 108, 116, 95, 116, 111, 107, 101, 110, 95, 97, 99, 99, 111, 117, 110, 116]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "vault_token_account.mint",
+                                "account": "TokenAccount"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "recipient_token_account",
+                    "writable": true
+                },
+                {
+                    "name": "token_program",
+                    "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+                },
+                {
+                    "name": "system_program",
+                    "address": "11111111111111111111111111111111"
+                },
+                {
+                    "name": "event_authority",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [95, 95, 101, 118, 101, 110, 116, 95, 97, 117, 116, 104, 111, 114, 105, 116, 121]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "program"
+                }
+            ],
+            "args": [
+                {
+                    "name": "amount",
+                    "type": "u64"
+                }
+            ]
+        }
+    ],
+    "accounts": [
+        {
+            "name": "OrderClaim",
+            "discriminator": [163, 80, 192, 16, 193, 200, 138, 191]
+        },
+        {
+            "name": "ProgramConfig",
+            "discriminator": [196, 210, 90, 231, 144, 149, 140, 63]
+        },
+        {
+            "name": "TokenVault",
+            "discriminator": [121, 7, 84, 254, 151, 228, 43, 144]
+        },
+        {
+            "name": "UserStake",
+            "discriminator": [102, 53, 163, 107, 9, 138, 87, 153]
+        }
+    ],
+    "events": [
+        {
+            "name": "ClaimHuntGoldEvent",
+            "discriminator": [237, 111, 166, 234, 80, 119, 80, 119]
+        },
+        {
+            "name": "ClaimRedPacket2Event",
+            "discriminator": [10, 106, 173, 233, 200, 15, 239, 216]
+        },
+        {
+            "name": "ClaimRedPacketEvent",
+            "discriminator": [189, 251, 191, 44, 59, 183, 171, 9]
+        },
+        {
+            "name": "CreateMeteoraPoolEvent",
+            "discriminator": [175, 17, 75, 230, 240, 109, 207, 245]
+        },
+        {
+            "name": "DepositEvent",
+            "discriminator": [120, 248, 61, 83, 31, 142, 107, 144]
+        },
+        {
+            "name": "PermanentLockPositionEvent",
+            "discriminator": [144, 187, 217, 185, 218, 37, 116, 19]
+        },
+        {
+            "name": "RefundHuntGoldEvent",
+            "discriminator": [50, 138, 41, 27, 203, 79, 99, 189]
+        },
+        {
+            "name": "StakeHuntGoldEvent",
+            "discriminator": [19, 108, 100, 202, 234, 114, 4, 178]
+        },
+        {
+            "name": "TokenCreatedEvent",
+            "discriminator": [96, 122, 113, 138, 50, 227, 149, 57]
+        },
+        {
+            "name": "WithdrawFromVaultEvent",
+            "discriminator": [103, 222, 159, 174, 11, 33, 109, 119]
+        }
+    ],
+    "errors": [
+        {
+            "code": 6000,
+            "name": "InvalidParameter",
+            "msg": "Invalid parameter"
+        },
+        {
+            "code": 6001,
+            "name": "Unauthorized",
+            "msg": "Unauthorized"
+        },
+        {
+            "code": 6002,
+            "name": "ProgramConfigAlreadyInitialized",
+            "msg": "Program config already initialized"
+        },
+        {
+            "code": 6003,
+            "name": "InvalidSignature",
+            "msg": "Invalid signature"
+        },
+        {
+            "code": 6004,
+            "name": "NotInRedPacketPhase",
+            "msg": "Not in red packet phase"
+        },
+        {
+            "code": 6005,
+            "name": "NotInHuntPhase",
+            "msg": "Not in hunt phase"
+        },
+        {
+            "code": 6006,
+            "name": "HuntPhaseNotEnded",
+            "msg": "Hunt phase not ended"
+        },
+        {
+            "code": 6007,
+            "name": "AlreadyClaimed",
+            "msg": "Already claimed"
+        },
+        {
+            "code": 6008,
+            "name": "NoStake",
+            "msg": "No stake"
+        },
+        {
+            "code": 6009,
+            "name": "StakeThresholdNotMet",
+            "msg": "Stake threshold not met"
+        },
+        {
+            "code": 6010,
+            "name": "StakeThresholdMet",
+            "msg": "Stake threshold met"
+        },
+        {
+            "code": 6011,
+            "name": "RedPacketLimitExceeded",
+            "msg": "Red packet limit exceeded"
+        },
+        {
+            "code": 6012,
+            "name": "ClaimExpired",
+            "msg": "Claim expired"
+        },
+        {
+            "code": 6013,
+            "name": "InvalidProgram",
+            "msg": "Invalid program"
+        },
+        {
+            "code": 6014,
+            "name": "InvalidFee",
+            "msg": "Invalid fee"
+        },
+        {
+            "code": 6015,
+            "name": "InvalidAmount",
+            "msg": "Invalid amount"
+        },
+        {
+            "code": 6016,
+            "name": "InsufficientTokens",
+            "msg": "Insufficient tokens"
+        },
+        {
+            "code": 6017,
+            "name": "InsufficientSOL",
+            "msg": "Insufficient SOL"
+        },
+        {
+            "code": 6018,
+            "name": "InvalidPlatform",
+            "msg": "Invalid platform"
+        }
+    ],
+    "types": [
+        {
+            "name": "ClaimHuntGoldEvent",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "user",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "token_mint",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "claimed_amount",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "user_total_staked",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "timestamp",
+                        "type": "i64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "ClaimRedPacket2Args",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "order_id",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "amount",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "sol_amount",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "signature",
+                        "type": {
+                            "array": ["u8", 65]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "ClaimRedPacket2Event",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "recipient",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "order_id",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "token_mint",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "amount",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "sol_amount",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "recipient_amount",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "first_level_referrer",
+                        "type": {
+                            "option": "pubkey"
+                        }
+                    },
+                    {
+                        "name": "first_level_reward",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "second_level_referrer",
+                        "type": {
+                            "option": "pubkey"
+                        }
+                    },
+                    {
+                        "name": "second_level_reward",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "red_packet_claimed_amount",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "total_sol_red_packet",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "timestamp",
+                        "type": "i64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "ClaimRedPacketArgs",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "order_id",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "amount",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "signature",
+                        "type": {
+                            "array": ["u8", 65]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "ClaimRedPacketEvent",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "recipient",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "order_id",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "token_mint",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "amount",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "recipient_amount",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "first_level_referrer",
+                        "type": {
+                            "option": "pubkey"
+                        }
+                    },
+                    {
+                        "name": "first_level_reward",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "second_level_referrer",
+                        "type": {
+                            "option": "pubkey"
+                        }
+                    },
+                    {
+                        "name": "second_level_reward",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "red_packet_claimed_amount",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "timestamp",
+                        "type": "i64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "CreateMeteoraPoolEvent",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "admin",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "token_mint",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "pool_address",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "token_amount",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "sol_amount",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "fee_bps",
+                        "type": "u16"
+                    },
+                    {
+                        "name": "timestamp",
+                        "type": "i64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "CreateMeteoraPoolParams",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "sqrt_min_price",
+                        "type": "u128"
+                    },
+                    {
+                        "name": "sqrt_max_price",
+                        "type": "u128"
+                    },
+                    {
+                        "name": "sqrt_price",
+                        "type": "u128"
+                    },
+                    {
+                        "name": "liquidity",
+                        "type": "u128"
+                    },
+                    {
+                        "name": "token_amount",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "wsol_amount",
+                        "type": "u64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "DepositArgs",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "order_id",
+                        "type": "string"
+                    },
+                    {
+                        "name": "command",
+                        "type": "string"
+                    },
+                    {
+                        "name": "extra_info",
+                        "type": "string"
+                    },
+                    {
+                        "name": "max_index",
+                        "type": "u8"
+                    },
+                    {
+                        "name": "index",
+                        "type": "u8"
+                    },
+                    {
+                        "name": "cost",
+                        "type": "u64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "DepositEvent",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "user",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "mint",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "cost",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "order_id",
+                        "type": "string"
+                    },
+                    {
+                        "name": "command",
+                        "type": "string"
+                    },
+                    {
+                        "name": "extra_info",
+                        "type": "string"
+                    },
+                    {
+                        "name": "max_index",
+                        "type": "u8"
+                    },
+                    {
+                        "name": "index",
+                        "type": "u8"
+                    },
+                    {
+                        "name": "timestamp",
+                        "type": "u64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "InitializeConfigArgs",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "platform",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "fee_recipient",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "supply",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "decimals",
+                        "type": "u8"
+                    },
+                    {
+                        "name": "admin_pubkey",
+                        "type": {
+                            "array": ["u8", 64]
+                        }
+                    },
+                    {
+                        "name": "red_packet_duration",
+                        "type": "u32"
+                    },
+                    {
+                        "name": "hunting_duration",
+                        "type": "u32"
+                    },
+                    {
+                        "name": "red_packet_to_hunting_delay",
+                        "type": "u32"
+                    },
+                    {
+                        "name": "hunt_gold_stake_threshold",
+                        "type": "u64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "OrderClaim",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "bump",
+                        "type": "u8"
+                    },
+                    {
+                        "name": "order_id",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "recipient",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "token_mint",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "amount",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "claimed_at",
+                        "type": "i64"
+                    },
+                    {
+                        "name": "sol_amount",
+                        "type": "u64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "PermanentLockPositionArgs",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "permanent_lock_liquidity",
+                        "type": "u128"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "PermanentLockPositionEvent",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "pool",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "position",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "owner",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "lock_liquidity_amount",
+                        "type": "u128"
+                    },
+                    {
+                        "name": "timestamp",
+                        "type": "u64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "ProgramConfig",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "bump",
+                        "type": "u8"
+                    },
+                    {
+                        "name": "is_initialized",
+                        "type": "bool"
+                    },
+                    {
+                        "name": "admin",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "platform",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "fee_recipient",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "supply",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "decimals",
+                        "type": "u8"
+                    },
+                    {
+                        "name": "admin_pubkey",
+                        "type": {
+                            "array": ["u8", 64]
+                        }
+                    },
+                    {
+                        "name": "red_packet_duration",
+                        "type": "u32"
+                    },
+                    {
+                        "name": "hunting_duration",
+                        "type": "u32"
+                    },
+                    {
+                        "name": "red_packet_to_hunting_delay",
+                        "type": "u32"
+                    },
+                    {
+                        "name": "hunt_gold_stake_threshold",
+                        "type": "u64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "RefundHuntGoldEvent",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "user",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "token_mint",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "refund_amount",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "timestamp",
+                        "type": "i64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "StakeHuntGoldArgs",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "amount",
+                        "type": "u64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "StakeHuntGoldEvent",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "user",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "token_mint",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "stake_amount",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "total_staked",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "user_total_staked",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "timestamp",
+                        "type": "i64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "TokenCreatedEvent",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "creator",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "mint",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "name": "symbol",
+                        "type": "string"
+                    },
+                    {
+                        "name": "uri",
+                        "type": "string"
+                    },
+                    {
+                        "name": "supply",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "decimals",
+                        "type": "u8"
+                    },
+                    {
+                        "name": "vault_address",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "redpacket_end_ts",
+                        "type": "u32"
+                    },
+                    {
+                        "name": "hunt_gold_start_ts",
+                        "type": "u32"
+                    },
+                    {
+                        "name": "hunt_gold_end_ts",
+                        "type": "u32"
+                    },
+                    {
+                        "name": "timestamp",
+                        "type": "u64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "TokenVault",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "bump",
+                        "type": "u8"
+                    },
+                    {
+                        "name": "mint",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "creator",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "created_at",
+                        "type": "u32"
+                    },
+                    {
+                        "name": "redpacket_end_ts",
+                        "type": "u32"
+                    },
+                    {
+                        "name": "hunt_gold_start_ts",
+                        "type": "u32"
+                    },
+                    {
+                        "name": "hunt_gold_end_ts",
+                        "type": "u32"
+                    },
+                    {
+                        "name": "red_packet_claimed_amount",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "speed",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "total_staked",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "last_update_time",
+                        "type": "u32"
+                    },
+                    {
+                        "name": "acc_reward_per_share",
+                        "type": "u128"
+                    },
+                    {
+                        "name": "total_sol_red_packet",
+                        "type": "u64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UpdateConfigArgs",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "new_admin",
+                        "type": {
+                            "option": "pubkey"
+                        }
+                    },
+                    {
+                        "name": "new_platform",
+                        "type": {
+                            "option": "pubkey"
+                        }
+                    },
+                    {
+                        "name": "new_fee_recipient",
+                        "type": {
+                            "option": "pubkey"
+                        }
+                    },
+                    {
+                        "name": "new_supply",
+                        "type": {
+                            "option": "u64"
+                        }
+                    },
+                    {
+                        "name": "new_decimals",
+                        "type": {
+                            "option": "u8"
+                        }
+                    },
+                    {
+                        "name": "new_admin_pubkey",
+                        "type": {
+                            "option": {
+                                "array": ["u8", 64]
+                            }
+                        }
+                    },
+                    {
+                        "name": "new_red_packet_duration",
+                        "type": {
+                            "option": "u32"
+                        }
+                    },
+                    {
+                        "name": "new_red_packet_to_hunting_delay",
+                        "type": {
+                            "option": "u32"
+                        }
+                    },
+                    {
+                        "name": "new_hunting_duration",
+                        "type": {
+                            "option": "u32"
+                        }
+                    },
+                    {
+                        "name": "new_hunt_gold_stake_threshold",
+                        "type": {
+                            "option": "u64"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UserStake",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "bump",
+                        "type": "u8"
+                    },
+                    {
+                        "name": "user",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "mint",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "total_staked",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "token_debt",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "pending_rewards",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "claimed",
+                        "type": "bool"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "WithdrawFromVaultEvent",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "admin",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "token_mint",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "token_amount",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "sol_amount",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "timestamp",
+                        "type": "i64"
+                    }
+                ]
+            }
+        }
+    ],
+    "constants": [
+        {
+            "name": "CLAIM_TIME_LIMIT",
+            "type": "i64",
+            "value": "600"
+        },
+        {
+            "name": "FIRST_LEVEL_REFERRAL_PERCENTAGE",
+            "type": "u64",
+            "value": "9"
+        },
+        {
+            "name": "HUNT_PHASE_PERCENTAGE",
+            "type": "u64",
+            "value": "80"
+        },
+        {
+            "name": "PROGRAM_CONFIG_SEED",
+            "type": "string",
+            "value": "\"program_config\""
+        },
+        {
+            "name": "SECOND_LEVEL_REFERRAL_PERCENTAGE",
+            "type": "u64",
+            "value": "3"
+        }
+    ]
+}

@@ -1,0 +1,129 @@
+@import "tailwindcss";
+
+body {
+    background: #6730fe;
+    color: #101010;
+    overflow-y: scroll;
+}
+
+@layer base {
+    /* 英文字体 */
+    @font-face {
+        font-family: "Manrope-Bold";
+        src: url("/fonts/Manrope-Bold.ttf") format("truetype");
+        font-weight: 500;
+    }
+
+    @font-face {
+        font-family: "Manrope-Medium";
+        src: url("/fonts/Manrope-Medium.ttf") format("truetype");
+        font-weight: 600;
+    }
+
+    @font-face {
+        font-family: "Manrope-SemiBold";
+        src: url("/fonts/Manrope-SemiBold.ttf") format("truetype");
+        font-weight: 700;
+    }
+
+    /* 中文字体 */
+    @font-face {
+        font-family: "AlibabaPuHuiTi-3-55-Regular";
+        src: url("/fonts/AlibabaPuHuiTi-3-55-Regular.otf") format("opentype");
+        font-weight: 500;
+    }
+
+    @font-face {
+        font-family: "AlibabaPuHuiTi-3-65-Medium";
+        src: url("/fonts/AlibabaPuHuiTi-3-65-Medium.otf") format("opentype");
+        font-weight: 600;
+    }
+
+    @font-face {
+        font-family: "AlibabaPuHuiTi-3-75-SemiBold";
+        src: url("/fonts/AlibabaPuHuiTi-3-75-SemiBold.otf") format("opentype");
+        font-weight: 700;
+    }
+}
+
+.lang-zh {
+    --font-500: "AlibabaPuHuiTi-3-55-Regular";
+    --font-600: "AlibabaPuHuiTi-3-65-Medium";
+    --font-700: "AlibabaPuHuiTi-3-75-SemiBold";
+}
+
+.lang-en {
+    --font-500: "Manrope-Medium";
+    --font-600: "Manrope-SemiBold";
+    --font-700: "Manrope-Bold";
+}
+
+.f500 {
+    font-family: var(--font-500);
+}
+.f600 {
+    font-family: var(--font-600);
+}
+.f700 {
+    font-family: var(--font-700);
+}
+
+.f5001 {
+    font-family: "Manrope-Medium";
+}
+.f6001 {
+    font-family: "Manrope-SemiBold";
+}
+.f7001 {
+    font-family: "Manrope-Bold";
+}
+
+body::-webkit-scrollbar {
+    display: none;
+}
+
+/* Firefox */
+* {
+    scrollbar-width: none; /* Firefox */
+}
+
+/* 其他浏览器 */
+body {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+    --rv-popup-background-color: transparent !important;
+    --rv-button-default-height: 52px;
+    --rv-button-border-radius: 16px;
+    --rv-button-normal-font-size: 15px;
+}
+
+.food {
+    transition: opacity 0.3s ease-in-out;
+}
+
+.snake {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    animation: snake-eat 2s linear forwards;
+}
+
+@keyframes snake-eat {
+    0% {
+        left: -20px;
+        opacity: 1;
+    }
+    80% {
+        left: 60px;
+        opacity: 1;
+    }
+    100% {
+        left: 90px;
+        opacity: 1;
+    }
+}
+
+.md-editor-preview .md-editor-code {
+    margin: 0 !important;
+}
