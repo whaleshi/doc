@@ -7,7 +7,6 @@ import { useLogin } from "@privy-io/react-auth";
 import useApiLogin from '@/hooks/useApiLogin';
 import { useUserStore } from '@/stores/user';
 import AvatarImage from '@/components/common/AvatarImage';
-import CreatePopup from '@/components/popup/CreatePopup'
 
 
 
@@ -83,7 +82,6 @@ export default function Header() {
 				}
 			</div>
 		</header>
-		<CreatePopup openStatus={createStatus} onConsumed={() => setCreateStatus(false)} />
 	</>;
 }
 
