@@ -1,5 +1,5 @@
 // components/MatterCanvas.js
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react'; // 导入 useCallback
 import { Engine, Render, World, Bodies, Runner, Composite } from 'matter-js';
 
 const MatterCanvas = () => {
@@ -17,28 +17,71 @@ const MatterCanvas = () => {
 	const [permissionGranted, setPermissionGranted] = useState(false);
 	const [permissionRequested, setPermissionRequested] = useState(false);
 
-	// 新增：用于存储陀螺仪运动数据的状态
-	const [motionData, setMotionData] = useState({ x: 0, y: 0, z: 0 });
+	// 新增：用于存储陀螺仪（DeviceOrientation）运动数据的状态
+	const [orientationData, setOrientationData] = useState({
+		alpha: 0,
+		beta: 0,
+		gamma: 0,
+	});
 
-	const requestDeviceMotionPermission = async () => {
-		if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+	// 使用 useCallback 包装事件处理函数，确保其引用稳定
+	const handleOrientation = useCallback((event) => {
+		// 确保 Matter.js 引擎存在
+		if (engineRef.current && permissionGranted) {
+			const { beta, gamma } = event; // 获取 beta 和 gamma 角度
+
+			setOrientationData({ // 更新显示数据
+				alpha: event.alpha ? event.alpha.toFixed(2) : 0,
+				beta: beta ? beta.toFixed(2) : 0,
+				gamma: gamma ? gamma.toFixed(2) : 0,
+			});
+
+			// 将角度转换为重力矢量
+			// Matter.js 重力默认强度为 0.001
+			// 角度通常在 -90 到 90 之间（gamma），或 -180 到 180 (beta)
+			// 我们需要将其标准化并映射到 Matter.js 的重力范围 (例如 -1 到 1)
+
+			const maxTiltAngle = 45; // 假设最大倾斜角度为 45 度，超过这个角度重力达到最大
+
+			// 计算 X 轴重力（左右倾斜）
+			// gamma 角度范围通常为 -90 到 90
+			const normalizedGamma = gamma / maxTiltAngle; // 归一化到 -1 到 1 范围
+			engineRef.current.world.gravity.x = Math.sin(normalizedGamma * Math.PI / 2); // 使用sin函数平滑映射
+
+			// 计算 Y 轴重力（前后倾斜）
+			// beta 角度范围通常为 -180 到 180，但对于前后倾斜，主要在 -90 到 90
+			const normalizedBeta = beta / maxTiltAngle; // 归一化到 -1 到 1 范围
+			// 注意：beta 增加通常是手机屏幕朝上倾斜，这在Matter.js中应该导致物体向上滚
+			// 因此，通常需要反转 beta 的影响，或者根据您的预期行为调整符号
+			engineRef.current.world.gravity.y = Math.sin(normalizedBeta * Math.PI / 2);
+
+			// 设置重力强度。这很重要，因为它影响倾斜的敏感度。
+			// 这个值越大，重力响应越强。通常在 0.1 到 2 之间调整。
+			engineRef.current.world.gravity.scale = 0.5; // 可以根据需要调整，0.5 是一个不错的起始值
+		}
+	}, [permissionGranted]); // handleOrientation 依赖 permissionGranted
+
+	// 请求设备方向权限的函数
+	const requestDeviceOrientationPermission = useCallback(async () => {
+		if (typeof DeviceOrientationEvent !== 'undefined' && typeof (DeviceOrientationEvent).requestPermission === 'function') {
 			try {
-				const permissionState = await DeviceMotionEvent.requestPermission();
+				const permissionState = await (DeviceOrientationEvent).requestPermission();
 				if (permissionState === 'granted') {
 					setPermissionGranted(true);
 				} else {
-					console.warn('Device motion permission denied.');
+					console.warn('Device orientation permission denied.');
 					setPermissionGranted(false);
 				}
 			} catch (error) {
-				console.error('Error requesting device motion permission:', error);
+				console.error('Error requesting device orientation permission:', error);
 				setPermissionGranted(false);
 			}
 		} else {
-			setPermissionGranted(true); // Assume granted for unsupported browsers
+			// Android 或非 iOS13+，直接假定已授权
+			setPermissionGranted(true);
 		}
 		setPermissionRequested(true);
-	};
+	}, []); // requestDeviceOrientationPermission 没有外部依赖
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -56,13 +99,15 @@ const MatterCanvas = () => {
 			}
 
 			if (engineRef.current && bodiesAddedRef.current) {
+				// 清除所有物体（包括旧墙壁），以便根据新尺寸重新添加
 				World.clear(engineRef.current.world);
-				bodiesAddedRef.current = false;
+				bodiesAddedRef.current = false; // 标记为需要重新添加物体
 			}
 		};
 
 		window.addEventListener('resize', handleResize);
 
+		// 初始化 Matter.js 引擎、渲染器和运行器
 		if (!engineRef.current) {
 			engineRef.current = Engine.create();
 		}
@@ -88,43 +133,33 @@ const MatterCanvas = () => {
 			Runner.run(runnerRef.current, engine);
 		}
 
+		// 只有在没有添加过物体时才添加它们（或尺寸改变后）
 		if (!bodiesAddedRef.current) {
 			World.add(engine.world, [
+				// 墙壁 (根据当前尺寸设置)
 				Bodies.rectangle(dimensions.width / 2, 0, dimensions.width, 50, { isStatic: true }),
 				Bodies.rectangle(dimensions.width / 2, dimensions.height, dimensions.width, 50, { isStatic: true }),
 				Bodies.rectangle(0, dimensions.height / 2, 50, dimensions.height, { isStatic: true }),
 				Bodies.rectangle(dimensions.width, dimensions.height / 2, 50, dimensions.height, { isStatic: true }),
 
-				Bodies.circle(150, 50, 30, { restitution: 0.9 }),
-				Bodies.rectangle(250, 100, 60, 40, { angle: Math.PI * 0.2 }),
-				Bodies.circle(350, 150, 40, { restitution: 0.7 }),
-				Bodies.rectangle(450, 200, 80, 50, { angle: Math.PI * 0.4 }),
+				// 一些球体和矩形
+				Bodies.circle(dimensions.width * 0.2, dimensions.height * 0.2, 30, { restitution: 0.9 }),
+				Bodies.rectangle(dimensions.width * 0.4, dimensions.height * 0.3, 60, 40, { angle: Math.PI * 0.2 }),
+				Bodies.circle(dimensions.width * 0.6, dimensions.height * 0.4, 40, { restitution: 0.7 }),
+				Bodies.rectangle(dimensions.width * 0.8, dimensions.height * 0.5, 80, 50, { angle: Math.PI * 0.4 }),
 			]);
 			bodiesAddedRef.current = true;
 		}
 
-		const handleDeviceMotion = (event) => {
-			if (engineRef.current && permissionGranted) {
-				const { x, y, z } = event.accelerationIncludingGravity;
-
-				// 更新陀螺仪数据显示
-				setMotionData({ x: x ? x.toFixed(2) : 0, y: y ? y.toFixed(2) : 0, z: z ? z.toFixed(2) : 0 });
-
-				const gravityScale = 0.05;
-
-				engineRef.current.world.gravity.x = x * gravityScale;
-				engineRef.current.world.gravity.y = y * gravityScale;
-				engineRef.current.world.gravity.scale = 0.001;
-			}
-		};
-
+		// 只有在权限被授予后才添加事件监听器
 		if (permissionGranted) {
-			window.addEventListener('devicemotion', handleDeviceMotion);
+			window.addEventListener('deviceorientation', handleOrientation);
 		}
 
+		// 清理函数
 		return () => {
 			window.removeEventListener('resize', handleResize);
-			window.removeEventListener('devicemotion', handleDeviceMotion);
+			window.removeEventListener('deviceorientation', handleOrientation); // 移除 deviceorientation 监听器
 
 			if (renderRef.current) {
 				Render.stop(renderRef.current);
@@ -143,11 +178,13 @@ const MatterCanvas = () => {
 				engineRef.current = null;
 			}
 			bodiesAddedRef.current = false;
+			// 重置权限状态，以便下次组件挂载时可以重新请求
 			setPermissionGranted(false);
 			setPermissionRequested(false);
 		};
-	}, [dimensions, permissionGranted]);
+	}, [dimensions, permissionGranted, handleOrientation]); // 依赖 dimensions, permissionGranted, handleOrientation
 
+	// 确保 div 元素占据整个视口
 	return (
 		<div style={{ width: '100vw', height: '100vh', overflow: 'hidden', position: 'relative' }}>
 			<div ref={canvasRef} />
@@ -168,16 +205,17 @@ const MatterCanvas = () => {
 						zIndex: 100,
 					}}
 				>
-					<strong>陀螺仪数据:</strong>
-					<div>X: {motionData.x}</div>
-					<div>Y: {motionData.y}</div>
-					<div>Z: {motionData.z}</div>
+					<strong>方向数据:</strong>
+					<div>Alpha: {orientationData.alpha}</div>
+					<div>Beta: {orientationData.beta}</div>
+					<div>Gamma: {orientationData.gamma}</div>
 				</div>
 			)}
 
-			{!permissionRequested && typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function' && (
+			{/* 权限请求按钮或提示 */}
+			{!permissionRequested && typeof DeviceOrientationEvent !== 'undefined' && typeof (DeviceOrientationEvent).requestPermission === 'function' && (
 				<button
-					onClick={requestDeviceMotionPermission}
+					onClick={requestDeviceOrientationPermission} // 使用新的权限请求函数
 					style={{
 						position: 'absolute',
 						top: '50%',
@@ -189,7 +227,7 @@ const MatterCanvas = () => {
 						cursor: 'pointer',
 					}}
 				>
-					启用设备运动控制
+					启用设备方向控制
 				</button>
 			)}
 			{!permissionGranted && permissionRequested && (
@@ -205,7 +243,7 @@ const MatterCanvas = () => {
 					textAlign: 'center',
 					zIndex: 100,
 				}}>
-					需要设备运动权限才能启用陀螺仪控制。
+					需要设备方向权限才能启用陀螺仪控制。
 					<br />
 					请确保在设备设置中允许访问。
 				</div>
