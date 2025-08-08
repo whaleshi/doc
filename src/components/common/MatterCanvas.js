@@ -19,25 +19,27 @@ const MatterCanvas = () => {
 	const [permissionRequested, setPermissionRequested] = useState(false); // 跟踪是否已请求过权限
 
 	// 请求设备运动权限的函数
-	const requestDeviceMotionPermission = async () => {
-		if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+	const requestIOSPermission = async () => {
+		if (
+			typeof DeviceOrientationEvent !== 'undefined' &&
+			typeof (DeviceOrientationEvent).requestPermission === 'function'
+		) {
 			try {
-				const permissionState = await DeviceMotionEvent.requestPermission();
-				if (permissionState === 'granted') {
+				const result = await (DeviceOrientationEvent).requestPermission();
+				if (result === 'granted') {
+					window.addEventListener('deviceorientation', handleOrientation, true);
 					setPermissionGranted(true);
 				} else {
-					console.warn('Device motion permission denied.');
-					setPermissionGranted(false);
+					alert("权限被拒绝");
 				}
-			} catch (error) {
-				console.error('Error requesting device motion permission:', error);
-				setPermissionGranted(false);
+			} catch (err) {
+				alert("请求失败：" + err);
 			}
 		} else {
-			// 在不支持 requestPermission 的浏览器上，直接假定已授权 (例如桌面浏览器)
+			// Android 或非 iOS13+，直接监听
+			window.addEventListener('deviceorientation', handleOrientation, true);
 			setPermissionGranted(true);
 		}
-		setPermissionRequested(true); // 标记已请求过权限
 	};
 
 
@@ -183,7 +185,7 @@ const MatterCanvas = () => {
 			{/* 只有在尚未请求权限且设备支持时才显示按钮 */}
 			{!permissionRequested && typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function' && (
 				<button
-					onClick={requestDeviceMotionPermission}
+					onClick={requestIOSPermission}
 					style={{
 						position: 'absolute',
 						top: '50%',
