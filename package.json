@@ -39,7 +39,6 @@
         "pusher-js": "^8.4.0",
         "qs": "^6.14.0",
         "react": "^19.0.0",
-        "react-device-motion": "^0.1.0",
         "react-dom": "^19.0.0",
         "react-i18next": "^15.5.3",
         "react-spring": "^10.0.1",
