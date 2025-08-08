@@ -1,13 +1,11 @@
-// components/MatterCanvas.js
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { Engine, Render, World, Bodies, Runner, Composite } from 'matter-js';
+import { Engine, Render, World, Bodies, Runner } from 'matter-js';
 
 const MatterCanvas = () => {
 	const canvasRef = useRef(null);
-	const engineInstanceRef = useRef(null); // 使用新的 ref 名称，避免与 Matter.Engine 混淆
-	const renderInstanceRef = useRef(null);
-	const runnerInstanceRef = useRef(null);
-	const bodiesAddedRef = useRef(false);
+	const engineRef = useRef(null);
+	const renderRef = useRef(null);
+	const runnerRef = useRef(null);
 
 	const [dimensions, setDimensions] = useState({
 		width: typeof window !== 'undefined' ? window.innerWidth : 800,
@@ -17,6 +15,7 @@ const MatterCanvas = () => {
 	const [permissionGranted, setPermissionGranted] = useState(false);
 	const [permissionRequested, setPermissionRequested] = useState(false);
 	const [deviceOrientationSupported, setDeviceOrientationSupported] = useState(false);
+	const [showGyroMessage, setShowGyroMessage] = useState(false);
 
 	const [orientationData, setOrientationData] = useState({
 		alpha: 0,
@@ -24,26 +23,32 @@ const MatterCanvas = () => {
 		gamma: 0,
 	});
 
+	// --- New State Variable for Settling ---
+	const [isSettled, setIsSettled] = useState(false);
+
+	// Handle device orientation events to update Matter.js gravity
 	const handleOrientation = useCallback((event) => {
-		if (engineInstanceRef.current && permissionGranted) {
+		// --- Apply gravity only if permission granted AND objects are settled ---
+		if (engineRef.current && permissionGranted && isSettled) {
 			const { beta, gamma } = event;
 
 			setOrientationData({
-				alpha: event.alpha ? event.alpha.toFixed(2) : 0,
-				beta: beta ? beta.toFixed(2) : 0,
-				gamma: gamma ? gamma.toFixed(2) : 0,
+				alpha: event.alpha ? parseFloat(event.alpha.toFixed(2)) : 0,
+				beta: beta ? parseFloat(beta.toFixed(2)) : 0,
+				gamma: gamma ? parseFloat(gamma.toFixed(2)) : 0,
 			});
 
-			const maxTiltAngle = 45;
-			const normalizedGamma = gamma / maxTiltAngle;
-			const normalizedBeta = beta / maxTiltAngle;
+			const maxTiltAngle = 45; // Degrees
+			const normalizedGamma = Math.max(-1, Math.min(1, gamma / maxTiltAngle));
+			const normalizedBeta = Math.max(-1, Math.min(1, beta / maxTiltAngle));
 
-			engineInstanceRef.current.world.gravity.x = Math.sin(normalizedGamma * Math.PI / 2);
-			engineInstanceRef.current.world.gravity.y = Math.sin(normalizedBeta * Math.PI / 2);
-			engineInstanceRef.current.world.gravity.scale = 0.5;
+			engineRef.current.world.gravity.x = Math.sin(normalizedGamma * Math.PI / 2);
+			engineRef.current.world.gravity.y = Math.sin(normalizedBeta * Math.PI / 2);
+			engineRef.current.world.gravity.scale = 0.0005; // Adjust for subtle tilt
 		}
-	}, [permissionGranted]);
+	}, [permissionGranted, isSettled]); // Add isSettled to dependencies
 
+	// Request device orientation permission
 	const requestDeviceOrientationPermission = useCallback(async () => {
 		if (typeof DeviceOrientationEvent !== 'undefined' && typeof (DeviceOrientationEvent).requestPermission === 'function') {
 			setDeviceOrientationSupported(true);
@@ -51,6 +56,8 @@ const MatterCanvas = () => {
 				const permissionState = await (DeviceOrientationEvent).requestPermission();
 				if (permissionState === 'granted') {
 					setPermissionGranted(true);
+					setShowGyroMessage(true);
+					setTimeout(() => setShowGyroMessage(false), 3000);
 				} else {
 					console.warn('Device orientation permission denied.');
 					setPermissionGranted(false);
@@ -61,7 +68,9 @@ const MatterCanvas = () => {
 			}
 		} else if (typeof DeviceOrientationEvent !== 'undefined') {
 			setDeviceOrientationSupported(true);
-			setPermissionGranted(true); // Assume granted for non-iOS browsers that support it without explicit request
+			setPermissionGranted(true);
+			setShowGyroMessage(true);
+			setTimeout(() => setShowGyroMessage(false), 3000);
 		} else {
 			setDeviceOrientationSupported(false);
 			setPermissionGranted(false);
@@ -70,118 +79,118 @@ const MatterCanvas = () => {
 		setPermissionRequested(true);
 	}, []);
 
-	// 主要的 Matter.js 初始化 useEffect
+	// --- Matter.js Initialization and Cleanup ---
 	useEffect(() => {
-		// 自动请求权限 (只在组件挂载时运行一次)
-		if (!permissionRequested) {
-			requestDeviceOrientationPermission();
-		}
+		const currentCanvas = canvasRef.current;
+		if (!currentCanvas) return;
 
-		// 初始化 Matter.js 引擎、渲染器和运行器
-		// 确保这些只在组件首次挂载时被创建
-		if (!engineInstanceRef.current) {
-			engineInstanceRef.current = Engine.create();
-		}
-		const engine = engineInstanceRef.current;
+		const engine = Engine.create();
+		engineRef.current = engine;
 
-		if (!renderInstanceRef.current) {
-			renderInstanceRef.current = Render.create({
-				element: canvasRef.current,
-				engine: engine,
-				options: {
-					width: dimensions.width,
-					height: dimensions.height,
-					wireframes: false,
-					background: '#f0f0f0',
-					pixelRatio: window.devicePixelRatio,
-				},
-			});
-			Render.run(renderInstanceRef.current);
-		}
+		const render = Render.create({
+			element: currentCanvas,
+			engine: engine,
+			options: {
+				width: dimensions.width,
+				height: dimensions.height,
+				wireframes: false,
+				background: '#f0f0f0',
+				pixelRatio: window.devicePixelRatio,
+			},
+		});
+		renderRef.current = render;
+		Render.run(render);
 
-		if (!runnerInstanceRef.current) {
-			runnerInstanceRef.current = Runner.create();
-			Runner.run(runnerInstanceRef.current, engine);
-		}
+		const runner = Runner.create();
+		runnerRef.current = runner;
+		Runner.run(runner, engine);
 
-		// 添加初始物体 (只在引擎创建时或清理后重新添加)
-		if (!bodiesAddedRef.current) {
-			World.add(engine.world, [
-				Bodies.rectangle(dimensions.width / 2, 0, dimensions.width, 50, { isStatic: true }),
-				Bodies.rectangle(dimensions.width / 2, dimensions.height, dimensions.width, 50, { isStatic: true }),
-				Bodies.rectangle(0, dimensions.height / 2, 50, dimensions.height, { isStatic: true }),
-				Bodies.rectangle(dimensions.width, dimensions.height / 2, 50, dimensions.height, { isStatic: true }),
-				Bodies.circle(dimensions.width * 0.2, dimensions.height * 0.2, 30, { restitution: 0.9 }),
-				Bodies.rectangle(dimensions.width * 0.4, dimensions.height * 0.3, 60, 40, { angle: Math.PI * 0.2 }),
-				Bodies.circle(dimensions.width * 0.6, dimensions.height * 0.4, 40, { restitution: 0.7 }),
-				Bodies.rectangle(dimensions.width * 0.8, dimensions.height * 0.5, 80, 50, { angle: Math.PI * 0.4 }),
-			]);
-			bodiesAddedRef.current = true;
-		}
+		const walls = [
+			Bodies.rectangle(dimensions.width / 2, 25, dimensions.width, 50, { isStatic: true, label: 'wallTop' }),
+			Bodies.rectangle(dimensions.width / 2, dimensions.height - 25, dimensions.width, 50, { isStatic: true, label: 'wallBottom' }),
+			Bodies.rectangle(25, dimensions.height / 2, 50, dimensions.height, { isStatic: true, label: 'wallLeft' }),
+			Bodies.rectangle(dimensions.width - 25, dimensions.height / 2, 50, dimensions.height, { isStatic: true, label: 'wallRight' }),
+		];
+		World.add(engine.world, walls);
 
-		// 清理函数：仅在组件卸载时执行一次
+		const dynamicBodies = [
+			Bodies.circle(dimensions.width * 0.2, dimensions.height * 0.2, 30, { restitution: 0.9, label: 'circle1' }),
+			Bodies.rectangle(dimensions.width * 0.4, dimensions.height * 0.3, 60, 40, { angle: Math.PI * 0.2, label: 'rect1' }),
+			Bodies.circle(dimensions.width * 0.6, dimensions.height * 0.4, 40, { restitution: 0.7, label: 'circle2' }),
+			Bodies.rectangle(dimensions.width * 0.8, dimensions.height * 0.5, 80, 50, { angle: Math.PI * 0.4, label: 'rect2' }),
+		];
+		World.add(engine.world, dynamicBodies);
+
+		// --- Set isSettled to true after a delay ---
+		// Give objects some time to fall and settle
+		const settlingTimer = setTimeout(() => {
+			setIsSettled(true);
+			console.log("Objects settled, gyroscope control enabled.");
+		}, 2000); // 2 seconds delay, adjust as needed
+
+		// Cleanup function
 		return () => {
-			// 停止并清理 Matter.js 实例
-			if (renderInstanceRef.current) {
-				Render.stop(renderInstanceRef.current);
-				renderInstanceRef.current.canvas.remove();
-				renderInstanceRef.current.context = null;
-				renderInstanceRef.current.textures = {};
+			clearTimeout(settlingTimer); // Clear timer on unmount
+
+			if (renderRef.current) {
+				Render.stop(renderRef.current);
+				if (renderRef.current.canvas && renderRef.current.canvas.parentNode) {
+					renderRef.current.canvas.parentNode.removeChild(renderRef.current.canvas);
+				}
+				renderRef.current.context = null;
+				renderRef.current.textures = {};
 			}
-			if (runnerInstanceRef.current) {
-				Runner.stop(runnerInstanceRef.current);
+			if (runnerRef.current) {
+				Runner.stop(runnerRef.current);
 			}
-			if (engineInstanceRef.current) {
-				World.clear(engineInstanceRef.current.world);
-				Engine.clear(engineInstanceRef.current);
+			if (engineRef.current) {
+				World.clear(engineRef.current.world);
+				Engine.clear(engineRef.current);
 			}
 
-			// 清除 ref 引用
-			engineInstanceRef.current = null;
-			renderInstanceRef.current = null;
-			runnerInstanceRef.current = null;
-			bodiesAddedRef.current = false;
-
-			// 重置状态
-			setPermissionGranted(false);
-			setPermissionRequested(false);
-			setDeviceOrientationSupported(false);
+			engineRef.current = null;
+			renderRef.current = null;
+			runnerRef.current = null;
+			setIsSettled(false); // Reset settling state on unmount
 		};
-	}, []); // <-- 确保这个 useEffect 的依赖数组为空，它只运行一次
+	}, []);
 
-	// 处理窗口大小变化的 useEffect
+	// --- Window Resize Handling ---
 	useEffect(() => {
 		const handleResize = () => {
-			setDimensions({
-				width: window.innerWidth,
-				height: window.innerHeight,
-			});
+			const newWidth = window.innerWidth;
+			const newHeight = window.innerHeight;
 
-			if (renderInstanceRef.current) {
-				renderInstanceRef.current.options.width = window.innerWidth;
-				renderInstanceRef.current.options.height = window.innerHeight;
-				renderInstanceRef.current.canvas.width = window.innerWidth;
-				renderInstanceRef.current.canvas.height = window.innerHeight;
-				Render.setPixelRatio(renderInstanceRef.current, window.devicePixelRatio);
+			setDimensions({ width: newWidth, height: newHeight });
+
+			if (renderRef.current) {
+				renderRef.current.options.width = newWidth;
+				renderRef.current.options.height = newHeight;
+				renderRef.current.canvas.width = newWidth;
+				renderRef.current.canvas.height = newHeight;
+				Render.setPixelRatio(renderRef.current, window.devicePixelRatio);
 			}
 
-			// 重新调整边界 (如果需要的话)
-			// 在这里，如果你希望墙壁随着窗口大小实时调整，你需要移除旧的墙壁并添加新的
-			if (engineInstanceRef.current) {
-				World.clear(engineInstanceRef.current.world); // 清除所有物体，包括旧墙壁
-				bodiesAddedRef.current = false; // 标记为需要重新添加物体
-				// 重新添加物体和墙壁
-				World.add(engineInstanceRef.current.world, [
-					Bodies.rectangle(window.innerWidth / 2, 0, window.innerWidth, 50, { isStatic: true }),
-					Bodies.rectangle(window.innerWidth / 2, window.innerHeight, window.innerWidth, 50, { isStatic: true }),
-					Bodies.rectangle(0, window.innerHeight / 2, 50, window.innerHeight, { isStatic: true }),
-					Bodies.rectangle(window.innerWidth, window.innerHeight / 2, 50, window.innerHeight, { isStatic: true }),
-					Bodies.circle(window.innerWidth * 0.2, window.innerHeight * 0.2, 30, { restitution: 0.9 }),
-					Bodies.rectangle(window.innerWidth * 0.4, window.innerHeight * 0.3, 60, 40, { angle: Math.PI * 0.2 }),
-					Bodies.circle(window.innerWidth * 0.6, window.innerHeight * 0.4, 40, { restitution: 0.7 }),
-					Bodies.rectangle(window.innerWidth * 0.8, window.innerHeight * 0.5, 80, 50, { angle: Math.PI * 0.4 }),
+			if (engineRef.current) {
+				const world = engineRef.current.world;
+
+				const walls = World.getAllBodies(world).filter(body => body.isStatic && body.label.startsWith('wall'));
+				World.remove(world, walls); // Remove old walls
+
+				// Re-add static walls with new dimensions
+				World.add(world, [
+					Bodies.rectangle(newWidth / 2, 25, newWidth, 50, { isStatic: true, label: 'wallTop' }),
+					Bodies.rectangle(newWidth / 2, newHeight - 25, newWidth, 50, { isStatic: true, label: 'wallBottom' }),
+					Bodies.rectangle(25, newHeight / 2, 50, newHeight, { isStatic: true, label: 'wallLeft' }),
+					Bodies.rectangle(newWidth - 25, newHeight / 2, 50, newHeight, { isStatic: true, label: 'wallRight' }),
 				]);
-				bodiesAddedRef.current = true;
+
+				// Reset settling state and re-enable timer on resize to allow objects to re-settle
+				setIsSettled(false);
+				setTimeout(() => {
+					setIsSettled(true);
+					console.log("Objects re-settled after resize, gyroscope control re-enabled.");
+				}, 1500); // Shorter delay for resize, adjust as needed
 			}
 		};
 
@@ -190,32 +199,28 @@ const MatterCanvas = () => {
 		return () => {
 			window.removeEventListener('resize', handleResize);
 		};
-	}, [dimensions]); // 仅在 dimensions 变化时运行
+	}, []);
 
-	// 处理陀螺仪事件的 useEffect (依赖于权限和支持性)
+	// --- Device Orientation Event Listener ---
 	useEffect(() => {
-		const engine = engineInstanceRef.current; // 获取当前的引擎实例
-
 		if (permissionGranted && deviceOrientationSupported) {
 			window.addEventListener('deviceorientation', handleOrientation);
-		} else if (engine) {
-			// 如果没有权限或设备不支持，设置 Matter.js 的默认重力（向下）
-			// 仅当引擎存在时才设置
-			engine.world.gravity.x = 0;
-			engine.world.gravity.y = 1; // 默认向下
-			engine.world.gravity.scale = 0.001; // Matter.js 默认重力强度
+		} else if (engineRef.current) {
+			engineRef.current.world.gravity.x = 0;
+			engineRef.current.world.gravity.y = 1;
+			engineRef.current.world.gravity.scale = 0.001;
 		}
 
 		return () => {
 			window.removeEventListener('deviceorientation', handleOrientation);
 		};
-	}, [permissionGranted, deviceOrientationSupported, handleOrientation]); // 依赖这些状态
+	}, [permissionGranted, deviceOrientationSupported, handleOrientation]);
 
 	return (
 		<div style={{ width: '100vw', height: '100vh', overflow: 'hidden', position: 'relative' }}>
-			<div ref={canvasRef} />
+			<div ref={canvasRef} style={{ width: '100%', height: '100%' }} />
 
-			{/* 陀螺仪信息显示框 - 仅在支持且权限授予时显示 */}
+			{/* Gyroscope Information Display */}
 			{permissionGranted && deviceOrientationSupported && (
 				<div
 					style={{
@@ -231,15 +236,15 @@ const MatterCanvas = () => {
 						zIndex: 100,
 					}}
 				>
-					<strong>方向数据:</strong>
+					<strong>Orientation Data:</strong>
 					<div>Alpha: {orientationData.alpha}</div>
 					<div>Beta: {orientationData.beta}</div>
 					<div>Gamma: {orientationData.gamma}</div>
 				</div>
 			)}
 
-			{/* 权限请求按钮或提示 */}
-			{!permissionGranted && !permissionRequested && typeof DeviceOrientationEvent !== 'undefined' && typeof (DeviceOrientationEvent).requestPermission === 'function' && (
+			{/* Permission / Status Messages */}
+			{!permissionGranted && !permissionRequested && deviceOrientationSupported && (
 				<button
 					onClick={requestDeviceOrientationPermission}
 					style={{
@@ -253,9 +258,10 @@ const MatterCanvas = () => {
 						cursor: 'pointer',
 					}}
 				>
-					启用设备方向控制 (点击请求权限)
+					Enable Device Orientation Control
 				</button>
 			)}
+
 			{!permissionGranted && permissionRequested && (
 				<div style={{
 					position: 'absolute',
@@ -270,12 +276,14 @@ const MatterCanvas = () => {
 					zIndex: 100,
 				}}>
 					{!deviceOrientationSupported
-						? '当前设备/浏览器不支持设备方向控制。将使用默认重力。'
-						: '权限被拒绝或用户未授权。请在设备设置中允许访问，或刷新重试。'
+						? 'Your device/browser does not support device orientation control. Default gravity will be used.'
+						: 'Permission denied or not granted by the user. Please allow access in device settings or refresh to retry.'
 					}
 				</div>
 			)}
-			{permissionGranted && deviceOrientationSupported && (
+
+			{/* Message about Gyroscope Status */}
+			{showGyroMessage && permissionGranted && deviceOrientationSupported && (
 				<div style={{
 					position: 'absolute',
 					top: '50%',
@@ -288,9 +296,30 @@ const MatterCanvas = () => {
 					textAlign: 'center',
 					zIndex: 100,
 					opacity: 0.9,
-					pointerEvents: 'none'
+					pointerEvents: 'none',
+					transition: 'opacity 0.5s ease-out',
 				}}>
-					陀螺仪已启用！请倾斜设备。
+					陀螺仪已启用！物体已落下，请倾斜设备。
+				</div>
+			)}
+
+			{/* New message to indicate settling period */}
+			{permissionGranted && deviceOrientationSupported && !isSettled && (
+				<div style={{
+					position: 'absolute',
+					top: '50%',
+					left: '50%',
+					transform: 'translate(-50%, -50%)',
+					backgroundColor: 'rgba(0,0,0,0.7)',
+					color: 'white',
+					padding: '15px',
+					borderRadius: '8px',
+					textAlign: 'center',
+					zIndex: 100,
+					opacity: 0.9,
+					pointerEvents: 'none',
+				}}>
+					物体正在落下...
 				</div>
 			)}
 		</div>
