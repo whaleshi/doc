@@ -340,49 +340,54 @@ const MatterCanvas = () => {
 		const engine = engineInstanceRef.current;
 		const world = engine.world;
 
+		// 控制最大倾斜范围和重力强度
 		const maxTilt = 30;
 		const tiltX = Math.max(-maxTilt, Math.min(maxTilt, gamma));
 		const tiltY = Math.max(-maxTilt, Math.min(maxTilt, beta));
-
 		const gravityX = Math.sin((tiltX / maxTilt) * Math.PI / 2) * 0.1;
 		const gravityY = Math.sin((tiltY / maxTilt) * Math.PI / 2) * 0.1;
 
-		// 设置世界重力方向（不是直接应用给物体）
+		// 设定世界重力方向
 		world.gravity.x = gravityX;
 		world.gravity.y = gravityY;
 
 		const bodies = Composite.allBodies(world);
 		for (let body of bodies) {
-			if (!body.isStatic) {
-				// 限制边界：避免穿墙
-				const margin = 10;
-				const radiusX = body.circleRadius || (body.bounds.max.x - body.bounds.min.x) / 2;
-				const radiusY = body.circleRadius || (body.bounds.max.y - body.bounds.min.y) / 2;
+			if (body.isStatic) continue;
 
-				if (body.position.x < margin + radiusX) {
-					Body.setPosition(body, { x: margin + radiusX, y: body.position.y });
-				} else if (body.position.x > dimensions.width - margin - radiusX) {
-					Body.setPosition(body, { x: dimensions.width - margin - radiusX, y: body.position.y });
-				}
+			const radiusY = body.circleRadius || (body.bounds.max.y - body.bounds.min.y) / 2;
 
-				if (body.position.y < margin + radiusY) {
-					Body.setPosition(body, { x: body.position.x, y: margin + radiusY });
-				} else if (body.position.y > dimensions.height - margin - radiusY) {
-					Body.setPosition(body, { x: body.position.x, y: dimensions.height - margin - radiusY });
-				}
+			const isTouchingGround =
+				body.position.y + radiusY >= dimensions.height - 50;
+			const isStable = body.speed < 0.1; // 近似静止
 
-				// 控制移动响应：仅落地的物体响应重力
-				if (!isOnGround(body)) {
-					Body.setVelocity(body, { x: 0, y: body.velocity.y });
-				} else {
-					Body.setVelocity(body, {
-						x: body.velocity.x * 0.9,
-						y: body.velocity.y * 0.9,
-					});
-				}
+			// 陀螺仪只影响完全落地且静止的物体
+			if (isTouchingGround && isStable) {
+				// 允许缓慢左右移动
+				Body.setVelocity(body, {
+					x: body.velocity.x * 0.9 + gravityX * 5,
+					y: body.velocity.y,
+				});
+			} else {
+				// 降低未落地物体的水平速度，防止空中响应
+				Body.setVelocity(body, {
+					x: body.velocity.x * 0.95,
+					y: body.velocity.y,
+				});
+			}
+
+			// 防止出界
+			const margin = 10;
+			const radiusX = body.circleRadius || (body.bounds.max.x - body.bounds.min.x) / 2;
+
+			if (body.position.x < margin + radiusX) {
+				Body.setPosition(body, { x: margin + radiusX, y: body.position.y });
+			} else if (body.position.x > dimensions.width - margin - radiusX) {
+				Body.setPosition(body, { x: dimensions.width - margin - radiusX, y: body.position.y });
 			}
 		}
 	}, [permissionGranted, dimensions]);
+
 
 	const requestDeviceOrientationPermission = useCallback(async () => {
 		if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
