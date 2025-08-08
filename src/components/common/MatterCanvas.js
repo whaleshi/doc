@@ -340,43 +340,39 @@ const MatterCanvas = () => {
 		const engine = engineInstanceRef.current;
 		const world = engine.world;
 
-		// 控制最大倾斜范围和重力强度
+		// 设置 gravity scale 与自由落体一致
+		world.gravity.scale = 0.001;
+
 		const maxTilt = 30;
 		const tiltX = Math.max(-maxTilt, Math.min(maxTilt, gamma));
 		const tiltY = Math.max(-maxTilt, Math.min(maxTilt, beta));
-		const gravityX = Math.sin((tiltX / maxTilt) * Math.PI / 2) * 0.1;
-		const gravityY = Math.sin((tiltY / maxTilt) * Math.PI / 2) * 0.1;
 
-		// 设定世界重力方向
+		const gravityX = Math.sin((tiltX / maxTilt) * Math.PI / 2); // 最大为 ±1
+		const gravityY = Math.sin((tiltY / maxTilt) * Math.PI / 2); // 最大为 ±1
+
+		// 设置真实重力方向
 		world.gravity.x = gravityX;
 		world.gravity.y = gravityY;
 
+		// 陀螺仪控制逻辑：只作用于已落地物体（可选，保留更自然）
 		const bodies = Composite.allBodies(world);
 		for (let body of bodies) {
 			if (body.isStatic) continue;
 
 			const radiusY = body.circleRadius || (body.bounds.max.y - body.bounds.min.y) / 2;
 
-			const isTouchingGround =
-				body.position.y + radiusY >= dimensions.height - 50;
-			const isStable = body.speed < 0.1; // 近似静止
+			const isTouchingGround = body.position.y + radiusY >= dimensions.height - 50;
+			const isStable = body.speed < 0.1;
 
-			// 陀螺仪只影响完全落地且静止的物体
-			if (isTouchingGround && isStable) {
-				// 允许缓慢左右移动
-				Body.setVelocity(body, {
-					x: body.velocity.x * 0.9 + gravityX * 5,
-					y: body.velocity.y,
-				});
-			} else {
-				// 降低未落地物体的水平速度，防止空中响应
+			if (!isTouchingGround || !isStable) {
+				// 降低横向速度，防止空中漂移
 				Body.setVelocity(body, {
 					x: body.velocity.x * 0.95,
 					y: body.velocity.y,
 				});
 			}
 
-			// 防止出界
+			// 防止出边界
 			const margin = 10;
 			const radiusX = body.circleRadius || (body.bounds.max.x - body.bounds.min.x) / 2;
 
@@ -387,6 +383,7 @@ const MatterCanvas = () => {
 			}
 		}
 	}, [permissionGranted, dimensions]);
+
 
 
 	const requestDeviceOrientationPermission = useCallback(async () => {
@@ -441,16 +438,38 @@ const MatterCanvas = () => {
 		}
 
 		if (!bodiesAddedRef.current) {
-			World.add(engine.world, [
-				Bodies.rectangle(dimensions.width / 2, 0, dimensions.width, 50, { isStatic: true }),
-				Bodies.rectangle(dimensions.width / 2, dimensions.height, dimensions.width, 50, { isStatic: true }),
-				Bodies.rectangle(0, dimensions.height / 2, 50, dimensions.height, { isStatic: true }),
-				Bodies.rectangle(dimensions.width, dimensions.height / 2, 50, dimensions.height, { isStatic: true }),
-				Bodies.circle(dimensions.width * 0.2, dimensions.height * 0.2, 30, { restitution: 0.9 }),
-				Bodies.rectangle(dimensions.width * 0.4, dimensions.height * 0.3, 60, 40, { angle: Math.PI * 0.2 }),
-				Bodies.circle(dimensions.width * 0.6, dimensions.height * 0.4, 40, { restitution: 0.7 }),
-				Bodies.rectangle(dimensions.width * 0.8, dimensions.height * 0.5, 80, 50, { angle: Math.PI * 0.4 }),
-			]);
+			const walls = [
+				Bodies.rectangle(dimensions.width / 2, 0, dimensions.width, 50, { isStatic: true }), // top
+				Bodies.rectangle(dimensions.width / 2, dimensions.height, dimensions.width, 50, { isStatic: true }), // bottom
+				Bodies.rectangle(0, dimensions.height / 2, 50, dimensions.height, { isStatic: true }), // left
+				Bodies.rectangle(dimensions.width, dimensions.height / 2, 50, dimensions.height, { isStatic: true }), // right
+			];
+
+			// 创建多个圆形与矩形，随机位置和角度
+			const shapes = [];
+
+			for (let i = 0; i < 12; i++) {
+				const x = dimensions.width * (0.1 + 0.8 * Math.random());
+				const y = dimensions.height * (0.1 + 0.5 * Math.random());
+				const angle = Math.random() * Math.PI;
+				const restitution = 0.5 + Math.random() * 0.5;
+
+				if (Math.random() > 0.5) {
+					shapes.push(
+						Bodies.circle(x, y, 20 + Math.random() * 30, { restitution })
+					);
+				} else {
+					shapes.push(
+						Bodies.rectangle(x, y, 40 + Math.random() * 60, 30 + Math.random() * 40, {
+							angle,
+							restitution,
+						})
+					);
+				}
+			}
+
+			World.add(engine.world, [...walls, ...shapes]);
+
 			bodiesAddedRef.current = true;
 		}
 
