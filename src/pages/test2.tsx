@@ -5,7 +5,7 @@ import Matter from "matter-js";
 
 export default function PhysicsGyroDemo() {
 	const sceneRef = useRef<HTMLDivElement>(null);
-	const engineRef = useRef<Matter.Engine>();
+	const engineRef = useRef<Matter.Engine>(null);
 	const [permissionGranted, setPermissionGranted] = useState(false);
 
 	useEffect(() => {
@@ -68,7 +68,8 @@ export default function PhysicsGyroDemo() {
 
 		// 鼠标拖拽支持
 		const mouseConstraint = Matter.MouseConstraint.create(engine, {
-			element: render.canvas,
+			// element?: render.canvas,
+			mouse: Matter.Mouse.create(render.canvas),
 			constraint: { stiffness: 0.2, render: { visible: false } },
 		});
 		Matter.World.add(engine.world, mouseConstraint);
